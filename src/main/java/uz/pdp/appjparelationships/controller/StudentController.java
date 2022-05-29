@@ -5,14 +5,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import uz.pdp.appjparelationships.entity.Address;
+import uz.pdp.appjparelationships.entity.Group;
 import uz.pdp.appjparelationships.entity.Student;
+import uz.pdp.appjparelationships.entity.Subject;
+import uz.pdp.appjparelationships.payload.StudentDto;
+import uz.pdp.appjparelationships.repository.AddressRepository;
+import uz.pdp.appjparelationships.repository.GroupRepository;
 import uz.pdp.appjparelationships.repository.StudentRepository;
+import uz.pdp.appjparelationships.repository.SubjectRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/student")
 public class StudentController {
     @Autowired
     StudentRepository studentRepository;
+    @Autowired
+    AddressRepository addressRepository ;
+    @Autowired
+    GroupRepository groupRepository ;
+
+    @Autowired
+    SubjectRepository subjectRepository ;
 
     //1. VAZIRLIK
     @GetMapping("/forMinistry")
@@ -44,5 +61,71 @@ public class StudentController {
     //3. FACULTY DEKANAT
     //4. GROUP OWNER
 
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Integer id){
+
+        try {
+            Optional<Student> optionalStudent = studentRepository.findById(id);
+            if (!optionalStudent.isPresent()) return "Student not found ";
+            studentRepository.delete(optionalStudent.get());
+        return " Deleted ";
+        }catch (Exception e) {
+            return "Error";
+        }
+    }
+
+
+    @PostMapping
+    public String sava(@RequestBody StudentDto studentDto){
+
+    try {
+
+        Optional<Address> optionalAddress = addressRepository.findById(studentDto.getAddressId());
+        if (!optionalAddress.isPresent()) return "Adress not found ";
+        Optional<Group> optionalGroup = groupRepository.findById(studentDto.getGroupId());
+        if (!optionalGroup.isPresent()) return "Group not found ";
+
+        List<Subject> subjectList = subjectRepository.findAllById(studentDto.getSubjectsId());
+
+        Student student = new Student();
+        student.setFirstName(studentDto.getFirstName());
+        student.setLastName(studentDto.getLastName());
+        student.setAddress(optionalAddress.get());
+        student.setGroup(optionalGroup.get());
+        student.setSubjects(subjectList);
+
+        return "Saved ";
+    }catch (Exception e) {
+
+        return "Error ";
+    }
+    }
+    @PutMapping("/{id}")
+    public String update(@PathVariable Integer id , @RequestBody StudentDto studentDto){
+
+        try {
+            Optional<Student> optionalStudent = studentRepository.findById(id);
+            if (!optionalStudent.isPresent())return "Student not found ";
+            Optional<Address> optionalAddress = addressRepository.findById(studentDto.getAddressId());
+            if (!optionalAddress.isPresent()) return "Adress not found ";
+            Optional<Group> optionalGroup = groupRepository.findById(studentDto.getGroupId());
+            if (!optionalGroup.isPresent()) return "Group not found ";
+
+            List<Subject> subjectList = subjectRepository.findAllById(studentDto.getSubjectsId());
+
+            Student student = optionalStudent.get();
+            student.setFirstName(studentDto.getFirstName());
+            student.setLastName(studentDto.getLastName());
+            student.setAddress(optionalAddress.get());
+            student.setGroup(optionalGroup.get());
+            student.setSubjects(subjectList);
+
+            return "Saved ";
+        }catch (Exception e) {
+
+            return "Error ";
+        }
+
+    }
 
 }
