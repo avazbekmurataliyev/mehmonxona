@@ -4,6 +4,9 @@ import hotel.uz.mehmonxona.entity.Room;
 import hotel.uz.mehmonxona.payload.RoomDto;
 import hotel.uz.mehmonxona.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +23,10 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public  Room get(@PathVariable Integer id){
-        return roomService.getOne(id);
+    public Page<Room> get(@PathVariable Integer id , @RequestParam Integer page){
+
+        Pageable pageable = PageRequest.of(page, 10);
+        return roomService.getOneHotelRooms(id, pageable);
     }
 
     @PostMapping

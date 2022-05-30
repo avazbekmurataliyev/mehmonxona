@@ -6,6 +6,8 @@ import hotel.uz.mehmonxona.payload.RoomDto;
 import hotel.uz.mehmonxona.repository.HotelRepository;
 import hotel.uz.mehmonxona.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,12 +25,9 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public Room getOne( Integer id){
-        Optional<Room> optionalRoom = roomRepository.findById(id);
-        if (optionalRoom.isPresent()){
-            return optionalRoom.get();
-        }
-        return new Room();
+    public Page<Room> getOneHotelRooms(Integer id , Pageable pageable){
+        Page<Room> allByHotelId = roomRepository.findAllByHotelId(id, pageable);
+        return allByHotelId;
     }
 
     public String delete( Integer id){
