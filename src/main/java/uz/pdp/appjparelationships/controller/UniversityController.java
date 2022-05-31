@@ -1,11 +1,16 @@
 package uz.pdp.appjparelationships.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.appjparelationships.entity.Address;
+import uz.pdp.appjparelationships.entity.Student;
 import uz.pdp.appjparelationships.entity.University;
 import uz.pdp.appjparelationships.payload.UniversityDto;
 import uz.pdp.appjparelationships.repository.AddressRepository;
+import uz.pdp.appjparelationships.repository.StudentRepository;
 import uz.pdp.appjparelationships.repository.UniversityRepository;
 
 import java.util.List;
@@ -18,7 +23,8 @@ public class UniversityController {
     @Autowired
     AddressRepository addressRepository;
 
-
+    @Autowired
+    StudentRepository studentRepository ;
     //READ
     @RequestMapping(value = "/university", method = RequestMethod.GET)
     public List<University> getUniversities() {
@@ -75,4 +81,14 @@ public class UniversityController {
         universityRepository.deleteById(id);
         return "University deleted";
     }
+
+
+
+    @GetMapping("/getStudents/byUniverstyId/{id}")
+    public Page<Student> getStudents(@PathVariable Integer id , @RequestParam Integer page)
+    {
+        Pageable pageable = PageRequest.of(page , 10);
+        return studentRepository.findAllByGroup_Faculty_UniversityId(id,pageable);
+    }
+
 }

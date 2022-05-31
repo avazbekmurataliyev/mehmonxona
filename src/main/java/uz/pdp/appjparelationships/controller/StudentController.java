@@ -15,6 +15,7 @@ import uz.pdp.appjparelationships.repository.GroupRepository;
 import uz.pdp.appjparelationships.repository.StudentRepository;
 import uz.pdp.appjparelationships.repository.SubjectRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ public class StudentController {
         //select * from student limit 10 offset (1*10)
         //select * from student limit 10 offset (2*10)
         //select * from student limit 10 offset (3*10)
-        Pageable pageable = PageRequest.of(page, 10);
+        Pageable pageable = PageRequest.of(page, 5);
         Page<Student> studentPage = studentRepository.findAllByGroup_Faculty_UniversityId(universityId, pageable);
         return studentPage;
     }
@@ -85,15 +86,16 @@ public class StudentController {
         Optional<Group> optionalGroup = groupRepository.findById(studentDto.getGroupId());
         if (!optionalGroup.isPresent()) return "Group not found ";
 
-        List<Subject> subjectList = subjectRepository.findAllById(studentDto.getSubjectsId());
 
+        if(studentDto.getSubjectsId()==null) return "Subject error ";
+        List<Subject> subjectList =  subjectRepository.findAllById(studentDto.getSubjectsId());
         Student student = new Student();
         student.setFirstName(studentDto.getFirstName());
         student.setLastName(studentDto.getLastName());
         student.setAddress(optionalAddress.get());
         student.setGroup(optionalGroup.get());
         student.setSubjects(subjectList);
-
+        studentRepository.save(student);
         return "Saved ";
     }catch (Exception e) {
 
@@ -111,7 +113,7 @@ public class StudentController {
             Optional<Group> optionalGroup = groupRepository.findById(studentDto.getGroupId());
             if (!optionalGroup.isPresent()) return "Group not found ";
 
-            List<Subject> subjectList = subjectRepository.findAllById(studentDto.getSubjectsId());
+            List<Subject> subjectList =subjectRepository.findAllById(studentDto.getSubjectsId());
 
             Student student = optionalStudent.get();
             student.setFirstName(studentDto.getFirstName());

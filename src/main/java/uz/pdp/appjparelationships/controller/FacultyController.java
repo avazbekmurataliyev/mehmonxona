@@ -1,11 +1,16 @@
 package uz.pdp.appjparelationships.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.appjparelationships.entity.Faculty;
+import uz.pdp.appjparelationships.entity.Student;
 import uz.pdp.appjparelationships.entity.University;
 import uz.pdp.appjparelationships.payload.FacultyDto;
 import uz.pdp.appjparelationships.repository.FacultyRepository;
+import uz.pdp.appjparelationships.repository.StudentRepository;
 import uz.pdp.appjparelationships.repository.UniversityRepository;
 
 import java.util.List;
@@ -20,6 +25,8 @@ public class FacultyController {
     @Autowired
     UniversityRepository universityRepository;
 
+    @Autowired
+    StudentRepository studentRepository ;
 
     //VAZIRLIK UCHUN
     @GetMapping
@@ -81,5 +88,12 @@ public class FacultyController {
         return "Faculty not found";
     }
 
+
+    @GetMapping("/getStudents/byFaculty/{id}")
+    public Page<Student> getStudents(@PathVariable Integer id , @RequestParam Integer page)
+    {
+        Pageable pageable = PageRequest.of(page , 10);
+        return studentRepository.findAllByGroup_FacultyId(id,pageable);
+    }
 
 }
